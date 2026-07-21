@@ -1,3 +1,6 @@
+
+"""Day 1: track position on a circular dial (0-99) based on L/R turns."""
+
 DIAL_MIN = 0
 DIAL_MAX = 99
 START_POSITION = 50
