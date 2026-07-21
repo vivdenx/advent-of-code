@@ -1,9 +1,12 @@
 """Day 3: find the max 2-digit joltage per battery bank, order-preserving."""
 
 
+from itertools import count
+
+
 def load_input(path: str) -> list[str]:
     with open(path) as f:
-        return f.read().split("\n")
+        return f.read().splitlines()
     
 
 def get_max_two_digit_number(bank: str) -> int:
@@ -14,6 +17,10 @@ def get_max_two_digit_number(bank: str) -> int:
             if number > highest:
                 highest = number
     return highest
+
+
+def get_highest_x_digit_number(bank: str, x: int) -> int:
+    print(bank)
 
 
 def get_maximum_joltage(banks: list[str]) -> int:
@@ -29,4 +36,9 @@ if __name__ == "__main__":
 
     data = load_input("./data/day03.txt")
     result = get_maximum_joltage(data)
+    
+    for bank in test.splitlines():
+        get_highest_x_digit_number(bank, x=2)
+    #assert sum(get_highest_x_digit_number(bank, x=12) for bank in test.splitlines()) == 3121910778619
     print(result)
+
