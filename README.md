@@ -1,5 +1,5 @@
 ﻿# Advent of Code
-https://adventofcode.com/
+🔗 https://adventofcode.com/
 
 # 2025 Tracker
 - Day 1 ✔️ 21-07-2026
