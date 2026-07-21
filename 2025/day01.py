@@ -2,6 +2,7 @@ DIAL_MIN = 0
 DIAL_MAX = 99
 START_POSITION = 50
 
+
 def load_input(path: str) -> list[str]:
     with open(path) as f:
         return f.read().splitlines()
@@ -28,6 +29,7 @@ def count_zero_landings(turns: list[str]) -> int:
             zero_landings += 1
     
     return zero_landings
+
 
 if __name__ == "__main__":
     test = ["L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82"]
