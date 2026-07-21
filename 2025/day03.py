@@ -19,26 +19,22 @@ def get_max_two_digit_number(bank: str) -> int:
 def get_highest_x_digit_number(bank: str, x: int) -> int:
     numbers = []
     i = 0
-    print(bank)
 
     while len(numbers) < x:
         highest = 0
-        for index, digit in enumerate(bank[i:len(bank)-x+i+1]):
+        original_index = i
+        for index, digit in enumerate(bank[i:len(bank)-x+len(numbers)+1]):
             if int(digit) > highest:
-                i = index
+                i = index + original_index
                 highest = int(digit)
-                numbers.append(highest)
-
-        #highest = max(d for d in bank[i:len(bank)-x+i+1])
-
-        #numbers.append(highest)
+        numbers.append(highest)
         i += 1
-        print(highest)
-    print(numbers)
-        
 
-def get_maximum_joltage(banks: list[str]) -> int:
-    return sum(get_max_two_digit_number(bank) for bank in banks)
+    numbers = ''.join(str(n) for n in numbers)
+    return int(numbers)        
+
+def get_maximum_joltage(banks: list[str], x: int) -> int:
+    return sum(get_highest_x_digit_number(bank, x) for bank in banks)
                     
     
 if __name__ == "__main__":
@@ -47,13 +43,11 @@ if __name__ == "__main__":
 234234234234278
 818181911112111"""
     test = test.splitlines()
-    assert get_maximum_joltage(test) == 357
+    assert get_maximum_joltage(test, 2) == 357
 
     data = load_input("./data/day03.txt")
-    result = get_maximum_joltage(data)
+    result = get_maximum_joltage(data, 2)
     
-    for bank in test:
-        get_highest_x_digit_number(bank, x=2)
-    #assert sum(get_highest_x_digit_number(bank, x=12) for bank in test.splitlines()) == 3121910778619
+    assert sum(get_highest_x_digit_number(bank, x=12) for bank in test) == 3121910778619
+    result = get_maximum_joltage(data, x=12)
     print(result)
-
