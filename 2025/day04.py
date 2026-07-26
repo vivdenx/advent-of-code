@@ -8,23 +8,17 @@ def check_pick_up(grid):
     padded_grid = ['.' + row + '.' for row in padded_grid]
     
     counter = 0
-    for i, row in enumerate(grid):
+    for i, row in enumerate(padded_grid):
         for j, value in enumerate(row):
             if value == "@":
-                if i != 0 and j != 0 and i != len(grid) - 1 and j != len(grid) - 1:
-                    first_row_count = grid[i-1][j-1:j+2].count('@')
-                    second_row_count = grid[i][j-1:j+2].count('@') - 1
-                    third_row_count = grid[i+1][j-1:j+2].count('@')
-
-                    print(first_row_count)
-                    print(second_row_count)
-                    print(third_row_count)
-                    print()
+                if all([i != 0, j != 0, i != len(padded_grid) - 1, j != len(padded_grid) - 1]):
+                    first_row_count = padded_grid[i-1][j-1:j+2].count('@')
+                    second_row_count = padded_grid[i][j-1:j+2].count('@') - 1
+                    third_row_count = padded_grid[i+1][j-1:j+2].count('@')
 
                     if sum([first_row_count, second_row_count, third_row_count]) < 4:
                         counter += 1
-
-    print(counter)
+    return counter
     
     
 if __name__ == "__main__":
@@ -39,5 +33,5 @@ if __name__ == "__main__":
 .@@@@@@@@.
 @.@.@@@.@.""".splitlines()
     data = load_input("./data/day04.txt")
-    print(test)
-    check_pick_up(test)
+    result = check_pick_up(data)
+    print(result)
