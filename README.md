@@ -5,6 +5,7 @@
 - Day 1 ✔️ 21-07-2026
 - Day 2 ✔️ 21-07-2026
 - Day 3 ✔️ 21-07-2026
+- Day 4 _in progress_
 
 # Notes
 - Day 3: greedy search as a concept
