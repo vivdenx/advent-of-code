@@ -1,37 +1,59 @@
+from pathlib import Path
+
 def load_input(path: str) -> list[str]:
-    with open(path) as f:
-        return f.read().splitlines()
+    return Path(path).read_text().splitlines()
 
-    
-def check_pick_up(grid: list[str], start_width: int) -> int:
-    if start_width == len(grid[0]):
-        padded_grid = [start_width * "."] + grid + [start_width * "."]
-        padded_grid = ['.' + row + '.' for row in padded_grid]
-    else:
-        padded_grid = grid
 
-    memory = [list(row) for row in padded_grid]
-    
-    counter = 0
-    for i, row in enumerate(padded_grid):
-        for j, value in enumerate(row):
-            if value == 'x':
-                memory[i][j] = '.'
-            if value != "@":
-                continue
-            if i == 0 or j == 0 or i == len(padded_grid) - 1 or j == len(row) - 1:
+def pad_grid(grid: list[str]) -> list[str]:
+    border = "." * (len(grid[0]) + 2)
+    return [border] + ['.' + row + '.' for row in grid] + [border]
+
+
+def remove_rolls(grid: list[str]) -> tuple[int, list[str]]:
+    """
+    Remove every '@' that has less than 4 '@' neighbours.
+    """
+    height, width = len(grid), len(grid[0])
+    new_grid = [list(row) for row in grid]
+    removed = 0
+
+    for i in range(1, height - 1):
+        for j in range(1, width - 1):
+            if grid[i][j] != '@':
                 continue
 
-            first_row_count = padded_grid[i-1][j-1:j+2].count('@')
-            second_row_count = padded_grid[i][j-1:j+2].count('@') - 1
-            third_row_count = padded_grid[i+1][j-1:j+2].count('@')
+            neighbors = (
+                grid[i-1][j-1:j+2].count('@')
+                + grid[i][j-1:j+2].count('@') - 1
+                + grid[i+1][j-1:j+2].count('@')
+            )
 
-            if first_row_count + second_row_count + third_row_count < 4:
-                counter += 1
-                memory[i][j] = 'x'
+            if neighbors < 4:
+                new_grid[i][j] = '.'
+                removed += 1
 
-    return counter, memory
-    
+    return removed, ["".join(row) for row in new_grid]
+
+
+def count_total_removals(grid: list[str]) -> int:
+    """Repeatedly remove lonely '@' until grid stabilizes"""
+    grid = pad_grid(grid)
+    total = 0
+    while True:
+        removed, grid = remove_rolls(grid)
+        total += removed
+        if removed == 0:
+            break
+    return total
+
+
+def solve_part1(grid: list[str]) -> int:
+    return remove_rolls(pad_grid(grid))[0]
+
+
+def solve_part2(grid: list[str]) -> int:
+    return count_total_removals(grid)
+
     
 if __name__ == "__main__":
     test = """..@@.@@@@.
@@ -44,30 +66,9 @@ if __name__ == "__main__":
 @.@@@.@@@@
 .@@@@@@@@.
 @.@.@@@.@.""".splitlines()
-    assert check_pick_up(test, len(test[0]))[0] == 13
+    assert solve_part1(test) == 13
+    assert solve_part2(test) == 43
 
     data = load_input("./data/day04.txt")
-    result = check_pick_up(data, len(data[0]))
-    print(result[0])
-
-    test_grid = test
-    test_counter = 1
-    start_width = len(test_grid[0]) 
-
-    full_counter = 0
-    while test_counter != 0:
-        test_counter, test_grid = check_pick_up(test_grid, start_width)
-        full_counter += test_counter
-    assert full_counter == 43
-
-    grid_copy = data
-    counter = 1
-    start_width = len(grid_copy[0])
-
-    all_rolls = 0
-    while counter != 0:
-        counter, grid_copy = check_pick_up(grid_copy, start_width)
-        all_rolls += counter
-    print(all_rolls)
-
-        
+    print(solve_part1(data))
+    print(solve_part2(data))
