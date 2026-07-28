@@ -39,10 +39,10 @@ def solve(text):
     ranges, available_ids = parse_input(text)
 
     fresh_count = count_fresh(available_ids, ranges)
-    print(fresh_count)
-
     merged = merge_ranges(ranges)
-    print(total_range_size(merged))
+    total_size = total_range_size(merged)
+
+    return fresh_count, total_size
 
 
 if __name__ == "__main__":
@@ -57,9 +57,13 @@ if __name__ == "__main__":
 11
 17
 32"""
-    solve(test)
+    part1, part2 = solve(test)
+    print(part1, part2)
+    assert part1 == 3
+    assert part2 == 14
 
     with open('./data/day05.txt') as f:
         data = f.read()
 
-    solve(data)
+    part1, part2 = solve(data)
+    print(part1, part2)
