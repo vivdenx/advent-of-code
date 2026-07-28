@@ -2,11 +2,13 @@
 🔗 https://adventofcode.com/
 
 # 2025 Tracker
-- Day 1 ✔️ 21-07-2026
-- Day 2 ✔️ 21-07-2026
+- Day 1 pt. 1 ✔️ 21-07-2026 ⚠️ forgot pt. 2!
+- Day 2 pt. 1✔️ 21-07-2026 ⚠️ forgot pt. 2!
 - Day 3 ✔️ 21-07-2026
 - Day 4 ✔️ 27-07-2026
+- Day 5 ✔️ 28-07-2026
 
 # Notes
 - Day 3: greedy search as a concept
+- Day 5: fast searching ranges
 
