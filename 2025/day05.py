@@ -1,32 +1,48 @@
-def load_input(test):
-    ranges, available = test.split('\n\n')
-    ranges = [e.split('-') for e in ranges.splitlines()]
-    ranges = [(int(start), int(end)) for start, end in ranges]
-    return ranges, available.splitlines()
+def parse_input(text):
+    """Parse the puzzle input into a list of (start, end) ranges and available IDs."""
+    ranges_block, available_block = text.split('\n\n')
+
+    ranges = []
+    for line in ranges_block.splitlines():
+        start, end = line.split('-')
+        ranges.append((int(start), int(end)))
+
+    available_ids = [int(x) for x in available_block.splitlines()]
+    return ranges, available_ids
 
 
-def find_fresh_ingredients(data):
-    ranges, available = load_input(data)
-    ranges = sorted(ranges)
-
-    counter = 0
-
-    for id in available:
-        if any(int(id) in range(start, end+1) for start, end in ranges):
-            counter += 1
-
-    print(counter)
-
+def merge_ranges(ranges):
+    """Merge overlapping or adjacent (start, end) ranges into a minimal set."""
     merged = []
-    for start, end in ranges:
-        if merged and start <= merged[-1][1] + 1:  # overlapping or adjacent
+    for start, end in sorted(ranges):
+        if merged and start <= merged[-1][1] + 1:
             merged[-1] = (merged[-1][0], max(merged[-1][1], end))
         else:
             merged.append((start, end))
+    return merged
 
-    print(sum([len(range(start, end + 1)) for start, end in merged]))
 
-    pass
+def count_fresh(available_ids, ranges):
+    """Count how many available IDs fall within any of the given ranges."""
+    return sum(
+        any(start <= id_ <= end for start, end in ranges)
+        for id_ in available_ids
+    )
+
+
+def total_range_size(ranges):
+    """Sum the sizes of a list of (start, end) inclusive ranges."""
+    return sum(end - start + 1 for start, end in ranges)
+
+
+def solve(text):
+    ranges, available_ids = parse_input(text)
+
+    fresh_count = count_fresh(available_ids, ranges)
+    print(fresh_count)
+
+    merged = merge_ranges(ranges)
+    print(total_range_size(merged))
 
 
 if __name__ == "__main__":
@@ -41,9 +57,9 @@ if __name__ == "__main__":
 11
 17
 32"""
-    find_fresh_ingredients(test)
+    solve(test)
 
     with open('./data/day05.txt') as f:
         data = f.read()
 
-    find_fresh_ingredients(data)
+    solve(data)
