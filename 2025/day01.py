@@ -34,9 +34,30 @@ def count_zero_landings(turns: list[str]) -> int:
     return zero_landings
 
 
+def solve_part2(turns: list[str]) -> int:
+    position = START_POSITION
+    zero_landings = 0
+
+    for turn in turns:
+        direction, amount = turn[0], int(turn[1:])
+        if direction == "L":
+            step = -1
+        elif direction == "R":
+            step = 1
+
+        for _ in range(amount):
+            position += step 
+            position = position % 100
+            if position == 0:
+                zero_landings += 1
+    return zero_landings
+
+
 if __name__ == "__main__":
     test = ["L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82"]
     assert count_zero_landings(test) == 3, "test case failed"
+    assert solve_part2(test) == 6, "test case (pt 2) failed"
 
     data = load_input("./data/day01.txt")
     print(count_zero_landings(data))
+    print(solve_part2(data))
