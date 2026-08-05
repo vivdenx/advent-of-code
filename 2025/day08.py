@@ -15,7 +15,7 @@ def solve1(data, max_connections=10):
         closest = ''
         for point_a in data:
             for point_b in data:
-                if point_a != point_b and (point_a, point_b) not in connections:
+                if point_a != point_b and (point_a, point_b) not in connections and (point_b, point_a) not in connections:
                     distance = calculate_distance(point_a, point_b)
                     if distance < minimum:
                         minimum = distance
@@ -23,6 +23,7 @@ def solve1(data, max_connections=10):
 
         connections.append(closest)
 
+        
     print(connections)
         
     pass
