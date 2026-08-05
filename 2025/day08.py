@@ -1,5 +1,7 @@
 from aocd import get_data, submit
 import math
+import numpy as np
+from scipy.spatial import KDTree
 
 def calculate_distance(point_a, point_b):
     point_a = [int(x) for x in point_a.split(',')]
@@ -23,10 +25,18 @@ def solve1(data, max_connections=10):
 
         connections.append(closest)
 
-        
     print(connections)
         
     pass
+
+def solve_kdtree(data):
+    tree = KDTree(data)
+    distances, indices = tree.query(data, k=2)
+    closest_neighbors = indices[:, 1]
+
+    for i, neighbor_idx in enumerate(closest_neighbors):
+        print(f"Point {i} {data[i]} connects to closest Point {neighbor_idx} {data[neighbor_idx]}")
+
 
 if __name__ == "__main__":
     test = """162,817,812
@@ -51,6 +61,9 @@ if __name__ == "__main__":
 425,690,689
 """.splitlines()
 
-    solve1(test)
+    #solve1(test)
+    test = [line.split(',') for line in test]
+    test = [[int(x) for x in line] for line in test]
+    solve_kdtree(test)
 
     data = get_data(year=2025, day=8).splitlines()
