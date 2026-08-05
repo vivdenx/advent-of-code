@@ -1,22 +1,29 @@
 from aocd import get_data, submit
 import math
 
-def solve1(data):
-    data = {index + 1: [int(i) for i in value.split(',')] for index, value in enumerate(data)}
-    
-    print(data)
-    
-    minimum = 100000
-    for i in data:
-        point_a = [int(x) for x in i.split(',')]
-        for j in data:
-            point_b = [int(x) for x in j.split(',')]
-            if i != j:
-                distance = math.dist(point_a, point_b)
-                if distance < minimum:
-                    minimum = distance
+def calculate_distance(point_a, point_b):
+    point_a = [int(x) for x in point_a.split(',')]
+    point_b = [int(x) for x in point_b.split(',')]
 
-    print(minimum)
+    return math.dist(point_a, point_b)
+
+
+def solve1(data, max_connections=10):
+    connections = []
+    while len(connections) < max_connections: 
+        minimum = float('inf')
+        closest = ''
+        for point_a in data:
+            for point_b in data:
+                if point_a != point_b and (point_a, point_b) not in connections:
+                    distance = calculate_distance(point_a, point_b)
+                    if distance < minimum:
+                        minimum = distance
+                        closest = (point_a, point_b)
+
+        connections.append(closest)
+
+    print(connections)
         
     pass
 
