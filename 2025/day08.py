@@ -1,24 +1,50 @@
 from aocd import get_data, submit
 import math
 from itertools import combinations
-import numpy as np
-
-def calculate_distance(point_a, point_b):
-    point_a = [int(x) for x in point_a.split(',')]
-    point_b = [int(x) for x in point_b.split(',')]
-
-    return math.dist(point_a, point_b)
 
 
-def find_edges(data, max_connections=None):
-    n = len(data)
-        
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.num_components = n
+
+    def find(self, x):
+        while self.parent[x] != x:
+            self.parent[x] = self.parent[self.parent[x]]  # path halving
+            x = self.parent[x]
+        return x
+
+    def union(self, x, y):
+        rx, ry = self.find(x), self.find(y)
+        if rx == ry:
+            return False  # already connected, no-op
+        if self.size[rx] < self.size[ry]:
+            rx, ry = ry, rx
+        self.parent[ry] = rx
+        self.size[rx] += self.size[ry]
+        self.num_components -= 1
+        return True
+
+    def component_sizes(self):
+        sizes = {}
+        for x in range(len(self.parent)):
+            root = self.find(x)
+            sizes[root] = sizes.get(root, 0) + 1
+        return list(sizes.values())
+
+
+def parse_points(data):
+    return [tuple(int(v) for v in line.split(',')) for line in data]
+
+
+def find_edges(points, max_connections=None):
     edges = []
-    for i, j in combinations(range(n), 2):
-        d = calculate_distance(data[i], data[j])
+    for i, j in combinations(range(len(points)), 2):
+        d = math.dist(points[i], points[j])
         edges.append((d, i, j))
 
-    edges = sorted(edges, key=lambda item: item[0])
+    edges.sort(key=lambda item: item[0])
 
     if max_connections:
         return edges[:max_connections]
@@ -26,74 +52,26 @@ def find_edges(data, max_connections=None):
 
 
 def solve1(data, max_connections=None):
-    edges = find_edges(data, max_connections)
+    points = parse_points(data)
+    edges = find_edges(points, max_connections)
 
-    # Union Find algorithm...
-    n = len(data)
-    parent = list(range(n))
-    size = [1] * n
-
-    def find(x):
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]  # path halving
-            x = parent[x]
-        return x
-
-    def union(x, y):
-        rx, ry = find(x), find(y)
-        if rx == ry:
-            return
-        # Only merge if they belong to different groups
-        # Union by rank: attach smaller tree to larger tree
-        if size[rx] < size[ry]:
-            rx, ry = ry, rx
-        parent[ry] = rx
-        size[rx] += size[ry]
-
+    uf = UnionFind(len(points))
     for _, i, j in edges:
-        union(i, j)
+        uf.union(i, j)
 
-    comp_sizes = {}
-    for i in range(n):
-        root = find(i)
-        comp_sizes[root] = comp_sizes.get(root, 0) + 1
-
-    sort = sorted(comp_sizes.values(), reverse=True)
-    return math.prod(sort[:3])
+    sizes = sorted(uf.component_sizes(), reverse=True)
+    return math.prod(sizes[:3])
 
 
-def solve2(data, max_connections=None):
-    edges = find_edges(data, max_connections)
-    
-    # Union Find algorithm...
-    n = len(data)
-    parent = list(range(n))
-    size = [1] * n
-    
-    def find(x):
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]  # path halving
-            x = parent[x]
-        return x
-    
-    def union(x, y):
-        rx, ry = find(x), find(y)
-        if rx == ry:
-            return
-        # Only merge if they belong to different groups
-        # Union by rank: attach smaller tree to larger tree
-        if size[rx] < size[ry]:
-            rx, ry = ry, rx
-        parent[ry] = rx
-        size[rx] += size[ry]
-    
+def solve2(data):
+    points = parse_points(data)
+    edges = find_edges(points)
+
+    uf = UnionFind(len(points))
     for _, i, j in edges:
-        union(i, j)
-        if len({find(x) for x in range(n)}) == 1:
-            x1, x2 = int(data[i].split(',')[0]), int(data[j].split(',')[0])
-            return math.prod([x1, x2])
-        
-
+        uf.union(i, j)
+        if uf.num_components == 1:
+            return points[i][0] * points[j][0]
 
 
 if __name__ == "__main__":
@@ -121,10 +99,10 @@ if __name__ == "__main__":
 
     assert solve1(test, 10) == 40, "test (pt 1) failed"
     assert solve2(test) == 25272, "test (pt 2) failed"
-    
+
     data = get_data(year=2025, day=8).splitlines()
     res = solve1(data, 1000)
-
+    submit(res, year=2025, day=8, part='a')
+    
     res = solve2(data)
-    submit(res, year=2025, day=8)
-
+    submit(res, year=2025, day=8, part='b')
