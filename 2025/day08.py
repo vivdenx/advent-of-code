@@ -19,72 +19,40 @@ def solve1_v2(data, max_connections = 10):
         d = calculate_distance(data[i], data[j])
         edges.append((d, i, j))
 
-    edges = sorted(edges, key=lambda item: item[0])
+    edges = sorted(edges, key=lambda item: item[0])[:max_connections]
 
-    groups = defaultdict()
+    # Union Find algorithm...
+    parent = list(range(n))
+    size = [1] * n
 
-    for _, i, j in edges[:max_connections]:
-        key = [key for key,value in groups.items() if i in value or j in value]
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]  # path halving
+            x = parent[x]
+        return x
 
-        if key:
-            if i in groups[key[0]]:
-                groups[key[0]] += [j]
-            else:
-                groups[key[0]] += [i]
+    def union(x, y):
+        rx, ry = find(x), find(y)
+        if rx == ry:
+            return
+        # Only merge if they belong to different groups
+        # Union by rank: attach smaller tree to larger tree
+        if size[rx] < size[ry]:
+            rx, ry = ry, rx
+        parent[ry] = rx
+        size[rx] += size[ry]
 
-        else:
-            res = 0
-            if groups:
-                res = max(groups, key=groups.get) + 1
-            groups[res] = [i] + [j]
+    for _, i, j in edges:
+        union(i, j)
 
-    length_dict = {key: len(value) for key, value in groups.items()}
-    length_dict = dict(sorted(length_dict.items(), key=lambda item: item[1], reverse=True)[:3])
+    comp_sizes = {}
+    for i in range(n):
+        root = find(i)
+        comp_sizes[root] = comp_sizes.get(root, 0) + 1
 
-    result = math.prod(length_dict.values())
-    return result
-
-
-
-def solve1(data, max_connections=10):
-    connections = defaultdict()
-    connections_list = []
-
-    while len(connections_list) < max_connections: 
-        minimum = float('inf')
-        closest = []
-        for i in range(len(data)):
-            for j in range(i+1, len(data)):
-                if (data[i], data[j]) not in connections_list and (data[j], data[i]) not in connections_list:
-                    distance = calculate_distance(data[i], data[j])
-                    if distance < minimum:
-                        minimum = distance
-                        closest = (data[i], data[j])
-
-        connections_list.append(closest)
-
-        point_a, point_b = closest
-        key = [key for key, value in connections.items() if point_a in value or point_b in value]
-
-        if key:
-            if point_a in connections[key[0]]:
-                connections[key[0]] += [point_b]
-            else:
-                connections[key[0]] += [point_a]
-
-        else:
-            if connections:
-                res = max(connections, key=connections.get) + 1
-            else:
-                res = 0
-
-            connections[res] = [point_a] + [point_b]
-
-    length_dict = {key: len(value) for key, value in connections.items()}
-    length_dict = dict(sorted(length_dict.items(), key=lambda item: item[1], reverse=True)[:3])
-
-    result = math.prod(length_dict.values())
-    return result
+    top3 = sorted(comp_sizes.values(), reverse=True)[:3]
+    return math.prod(top3)
+    
 
 if __name__ == "__main__":
     test = """162,817,812
@@ -117,3 +85,4 @@ if __name__ == "__main__":
     data = get_data(year=2025, day=8).splitlines()
     res = solve1_v2(data, 1000)
     print(res)
+    submit(res, year=2025, day=8)
